@@ -127,6 +127,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .ib p{font-size:10px;color:var(--muted);line-height:1.6}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--accent);color:var(--bg);padding:8px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;opacity:0;transition:all .3s;z-index:500;white-space:nowrap}
 .toast.vis{transform:translateX(-50%) translateY(0);opacity:1}
+.imp-item{display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-top:6px;font-size:10px}
+.imp-item .imp-name{font-weight:600;color:var(--text)}
+.imp-item .imp-url{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Courier New',monospace;font-size:9px}
+.imp-item .imp-del{width:18px;height:18px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;border-radius:4px;display:grid;place-items:center}
+.imp-item .imp-del:hover{background:var(--red-bg);color:var(--red)}
+.imp-item .imp-sync{width:18px;height:18px;border:none;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;border-radius:4px;display:grid;place-items:center}
+.imp-item .imp-sync:hover{background:var(--accent-bg)}
 @media(max-width:600px){.dy{min-height:48px;padding:3px}.dn{font-size:9px}.dy.blocked::after{height:3px;bottom:2px;left:2px;right:2px}.ml{font-size:16px;min-width:auto}}
 </style>
 </head>
@@ -226,6 +233,25 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
           <div class="fu-box"><div class="fu" id="jsonUrl">—</div><button class="btn btn-sm" onclick="copyU('json')">📋</button></div>
         </div>
       </div>
+      <div id="importSection" style="display:none">
+        <div class="sbt">📥 iCal Import (Zwei-Wege-Sync)</div>
+        <div class="fc">
+          <h4>🔄 Externe Kalender importieren</h4>
+          <div class="fd">iCal-URLs von Airbnb, Booking.com etc. — gebuchte Tage werden automatisch blockiert.</div>
+          <div id="importList"></div>
+          <div style="margin-top:8px">
+            <input type="url" id="newImportUrl" placeholder="https://www.airbnb.com/calendar/ical/..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-family:'Outfit';font-size:11px;background:var(--bg);color:var(--text);outline:none;margin-bottom:4px">
+            <select id="newImportName" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-family:'Outfit';font-size:11px;background:var(--bg);color:var(--text);outline:none;margin-bottom:6px">
+              <option value="Airbnb">🏡 Airbnb</option>
+              <option value="Booking.com">🅱️ Booking.com</option>
+              <option value="Gruppenunterkünfte.de">👥 Gruppenunterkünfte.de</option>
+              <option value="Sonstige">📅 Sonstige</option>
+            </select>
+            <button class="btn btn-a btn-sm" style="width:100%" onclick="addImport()">+ Feed importieren</button>
+          </div>
+        </div>
+        <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:4px" onclick="syncAllImports()">🔄 Alle Feeds jetzt synchronisieren</button>
+      </div>
       <div id="actionsSection" style="display:none">
         <div class="sbt">Schnellaktionen</div>
         <div class="qg">
@@ -280,6 +306,10 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   window.mD=mD;
   window.mE=mE;
   window.mU=mU;
+  window.addImport=addImport;
+  window.removeImport=removeImport;
+  window.syncImport=syncImport;
+  window.syncAllImports=syncAllImports;
 
   // ============ DOM REFS ============
   const $=id=>document.getElementById(id);
@@ -399,13 +429,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     activeProp=p;
     blocked=new Set();
     renderProps();
-    // Show calendar area
     var npm=$('noPropMsg');if(npm)npm.style.display='none';
     var ca=$('calArea');if(ca)ca.style.display='';
     var fs=$('feedSection');if(fs)fs.style.display='';
+    var is=$('importSection');if(is)is.style.display='';
     var as=$('actionsSection');if(as)as.style.display='';
     var fpn=$('feedPropName');if(fpn)fpn.textContent=p.name;
     updateUrls();
+    renderImports();
     renderCal();
     loadBin();
   }
@@ -414,6 +445,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     var npm=$('noPropMsg');if(npm)npm.style.display='';
     var ca=$('calArea');if(ca)ca.style.display='none';
     var fs=$('feedSection');if(fs)fs.style.display='none';
+    var is=$('importSection');if(is)is.style.display='none';
     var as=$('actionsSection');if(as)as.style.display='none';
   }
 
@@ -509,6 +541,86 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     });
   }
 
+  // ============ ICAL IMPORT / SYNC ============
+  function getImports(){
+    if(!activeProp)return[];
+    return activeProp.imports||[];
+  }
+
+  function renderImports(){
+    var list=$('importList');
+    if(!list)return;
+    var imports=getImports();
+    if(imports.length===0){list.innerHTML='<div style="font-size:10px;color:var(--muted);padding:4px 0;">Noch keine Import-Feeds.</div>';return}
+    list.innerHTML=imports.map(function(imp,idx){
+      return '<div class="imp-item">'
+        +'<span class="imp-name">'+esc(imp.name)+'</span>'
+        +'<span class="imp-url" title="'+esc(imp.url)+'">'+esc(imp.url.substring(0,40))+'…</span>'
+        +'<button class="imp-sync" onclick="syncImport('+idx+')" title="Synchronisieren">🔄</button>'
+        +'<button class="imp-del" onclick="removeImport('+idx+')" title="Entfernen">×</button>'
+        +'</div>';
+    }).join('');
+  }
+
+  function addImport(){
+    if(!activeProp)return;
+    var urlEl=$('newImportUrl');
+    var nameEl=$('newImportName');
+    if(!urlEl||!nameEl)return;
+    var url=urlEl.value.trim();
+    var name=nameEl.value;
+    if(!url){toast('Bitte iCal-URL einfügen');return}
+    if(!activeProp.imports)activeProp.imports=[];
+    activeProp.imports.push({name:name,url:url});
+    saveSession();
+    urlEl.value='';
+    renderImports();
+    toast('✅ "'+name+'" Feed hinzugefügt');
+    // Auto-sync the new feed
+    syncImport(activeProp.imports.length-1);
+  }
+
+  function removeImport(idx){
+    if(!activeProp||!activeProp.imports)return;
+    var imp=activeProp.imports[idx];
+    activeProp.imports.splice(idx,1);
+    saveSession();
+    renderImports();
+    toast('🗑 "'+imp.name+'" entfernt');
+  }
+
+  async function syncImport(idx){
+    if(!activeProp||!activeProp.imports)return;
+    var imp=activeProp.imports[idx];
+    if(!imp)return;
+    toast('🔄 Synchronisiere "'+imp.name+'"…');
+    setSt('ld','Sync…');
+    try{
+      var syncUrl='/api/sync?ical='+encodeURIComponent(imp.url)+'&bin='+activeProp.binId;
+      var r=await fetch(syncUrl);
+      if(!r.ok){var errData=await r.json();throw new Error(errData.error||'Sync fehlgeschlagen')}
+      var d=await r.json();
+      var newCount=d.newDates?d.newDates.length:0;
+      // Reload calendar with merged data
+      if(d.blocked){blocked=new Set(d.blocked)}else{await loadBin();return}
+      renderCal();
+      setSt('ok','Sync · '+ts());
+      toast('✅ "'+imp.name+'": '+newCount+' neue Tage blockiert');
+    }catch(e){
+      setSt('err','Sync-Fehler');
+      toast('❌ '+e.message);
+    }
+  }
+
+  async function syncAllImports(){
+    if(!activeProp||!activeProp.imports||activeProp.imports.length===0){toast('Keine Import-Feeds vorhanden');return}
+    toast('🔄 Synchronisiere alle Feeds…');
+    for(var i=0;i<activeProp.imports.length;i++){
+      await syncImport(i);
+    }
+    toast('✅ Alle Feeds synchronisiert!');
+  }
+
   // ============ HELPERS ============
   function fmt(d){if(typeof d==='string')return d;return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
   function ts(){return new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}
@@ -521,4 +633,3 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 </script>
 </body>
 </html>
-
