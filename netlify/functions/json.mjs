@@ -1,13 +1,13 @@
 // Netlify Serverless Function: JSON Feed
-// Returns blocked dates as clean JSON for website calendar plugins
-// URL: https://your-site.netlify.app/feed.json
+// URL: https://your-site.netlify.app/feed.json?bin=BIN_ID
 
 export default async (request, context) => {
-  const BIN_ID = Netlify.env.get("JSONBIN_BIN_ID");
+  const url = new URL(request.url);
+  const BIN_ID = url.searchParams.get("bin");
   const API_KEY = Netlify.env.get("JSONBIN_API_KEY");
 
   if (!BIN_ID || !API_KEY) {
-    return Response.json({ error: "Nicht konfiguriert" }, { status: 500 });
+    return Response.json({ error: "?bin= Parameter oder API Key fehlt" }, { status: 400 });
   }
 
   try {
