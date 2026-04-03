@@ -21,6 +21,52 @@
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
+/* ---- LOGIN SCREEN ---- */
+.login-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .4s,visibility .4s;
+}
+.login-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.login-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:44px 40px;width:420px;max-width:92vw;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);animation:fadeUp .5s ease-out;
+}
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.login-box .logo-big{
+  width:56px;height:56px;border-radius:14px;background:var(--accent);color:var(--bg);
+  display:grid;place-items:center;font-weight:800;font-size:24px;margin:0 auto 16px;
+}
+.login-box h1{font-family:'Fraunces',serif;font-size:28px;margin-bottom:4px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-box .sub{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
+.login-box p.desc{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6;text-align:left}
+.login-fg{margin-bottom:14px;text-align:left}
+.login-fg label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.login-fg input{
+  width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-family:'Outfit';font-size:13px;background:var(--bg);color:var(--text);outline:none;
+}
+.login-fg input:focus{border-color:var(--accent)}
+.login-fg .hint{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+.login-btn{
+  width:100%;padding:12px;border-radius:var(--radius-sm);border:none;
+  background:var(--accent);color:var(--bg);font-family:'Outfit';
+  font-size:14px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:6px;
+}
+.login-btn:hover{background:#8BC62C}
+.login-error{font-size:11px;color:var(--red);margin-top:10px;min-height:16px}
+.login-fg input.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.login-divider{height:1px;background:var(--border);margin:20px 0}
+.login-info{
+  background:var(--accent-bg);border:1px solid rgba(163,230,53,.15);border-radius:var(--radius-sm);
+  padding:12px 14px;text-align:left;font-size:11px;color:var(--muted);line-height:1.6;
+}
+.login-info strong{color:var(--accent)}
+
+/* ---- TOP BAR ---- */
 .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:15px}
@@ -36,6 +82,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .btn-a{background:var(--accent);color:var(--bg);border-color:var(--accent)}.btn-a:hover{background:#8BC62C}
 .btn-sm{padding:5px 10px;font-size:10px}
 
+/* ---- LAYOUT ---- */
 .layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 57px)}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.side{border-left:none;border-top:1px solid var(--border)}}
 
@@ -85,24 +132,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .ib h4{font-size:12px;color:var(--accent);margin-bottom:4px}
 .ib p{font-size:11px;color:var(--muted);line-height:1.6}
 
-.so{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;display:none;place-items:center}
-.so.open{display:grid}
-.sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:480px;max-width:92vw;animation:mU .25s ease-out;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-@keyframes mU{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.sh{padding:22px 24px;border-bottom:1px solid var(--border)}
-.sh h2{font-family:'Fraunces',serif;font-size:22px;margin-bottom:4px}
-.sh p{font-size:12px;color:var(--muted)}
-.sb{padding:24px}
-.fg{margin-bottom:16px}
-.fg label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.fg input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit';font-size:13px;background:var(--bg);color:var(--text);outline:none}
-.fg input:focus{border-color:var(--accent)}
-.fg .ht{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.5}
-.sf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-.ss{padding:0 0 16px;font-size:12px;color:var(--muted);line-height:2}
-.ss ol{padding-left:20px}
-.ss a{color:var(--accent);font-weight:600;text-decoration:none}
-
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--accent);color:var(--bg);padding:9px 20px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;opacity:0;transition:all .3s;z-index:500;white-space:nowrap}
 .toast.vis{transform:translateX(-50%) translateY(0);opacity:1}
 
@@ -111,12 +140,48 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 </head>
 <body>
 
+<!-- ============ LOGIN SCREEN ============ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="logo-big">B</div>
+    <h1>BookSync</h1>
+    <div class="sub">Belegungszentrale</div>
+
+    <div class="login-fg">
+      <label>JSONBin API Key</label>
+      <input type="password" id="loginKey" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxxxxx" onkeydown="if(event.key==='Enter')document.getElementById('loginBin').focus()">
+      <div class="hint">Dein persönlicher Schlüssel von jsonbin.io → API Keys</div>
+    </div>
+
+    <div class="login-fg">
+      <label>Bin ID <span style="opacity:.5;font-weight:400;text-transform:none">(leer lassen = neue Datenbank erstellen)</span></label>
+      <input type="text" id="loginBin" placeholder="Optional — wird automatisch erstellt" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="hint">Falls du schon eine Bin-ID hast, hier einfügen. Sonst leer lassen.</div>
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">🚀 Einloggen</button>
+    <div class="login-error" id="loginError"></div>
+
+    <div class="login-divider"></div>
+    <div class="login-info">
+      <strong>Noch kein Account?</strong><br>
+      1. Gehe zu <a href="https://jsonbin.io/signup" target="_blank" style="color:var(--accent)">jsonbin.io/signup</a> — kostenlos<br>
+      2. Nach Login → oben rechts <strong>API Keys</strong><br>
+      3. <strong>X-Master-Key</strong> kopieren und hier einfügen<br><br>
+      <strong>🔑 Jeder Key = eigener Kalender.</strong> So kannst du dieses Tool mit Freunden teilen — jeder nutzt seinen eigenen Key und hat seinen eigenen Belegungskalender.
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP (hidden until login) ============ -->
+<div id="appWrapper" style="display:none">
+
 <div class="topbar">
   <div class="logo"><div class="logo-mark">B</div><div><h1>BookSync</h1><small>Belegungszentrale</small></div></div>
   <div class="topbar-r">
     <div class="pill" id="sp"><span class="sd ld"></span><span id="st">Verbinde…</span></div>
     <button class="btn" onclick="loadData()">🔄</button>
-    <button class="btn" onclick="openS()">⚙️</button>
+    <button class="btn" onclick="doLogout()" title="Abmelden">🔒 Abmelden</button>
   </div>
 </div>
 
@@ -149,7 +214,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="side">
     <div>
       <div class="sbt">Deine Live-Feeds (Output)</div>
-
       <div class="fc">
         <h4>📅 iCal Feed <span class="tg" style="background:var(--blue-bg);color:var(--blue)">LIVE URL</span></h4>
         <div class="fd">Für <strong>Airbnb, Booking.com, Gruppenunterkünfte.de</strong> — diese URL als Kalender importieren.</div>
@@ -158,7 +222,6 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
           <button class="btn btn-sm" onclick="copyU('ics')">📋</button>
         </div>
       </div>
-
       <div class="fc">
         <h4>📊 JSON Feed <span class="tg" style="background:var(--green-bg);color:var(--green)">LIVE URL</span></h4>
         <div class="fd">Für dein <strong>Website-Kalender-Plugin</strong>. Liefert die blockierten Tage als JSON.</div>
@@ -190,79 +253,114 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
         </p>
       </div>
     </div>
+
+    <div>
+      <div class="sbt">Session</div>
+      <div class="fc" style="margin-bottom:0">
+        <h4>👤 Eingeloggt</h4>
+        <div class="fd">Bin-ID: <span id="dispBin" style="color:var(--accent);font-family:'Courier New',monospace">—</span></div>
+        <div style="margin-top:8px">
+          <button class="btn btn-sm" onclick="doLogout()">🔒 Abmelden</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- SETUP -->
-<div class="so" id="sO">
-  <div class="sm">
-    <div class="sh"><h2>⚙️ Einrichtung</h2><p>Verbinde JSONBin.io als kostenlosen Cloud-Speicher.</p></div>
-    <div class="sb">
-      <div class="ss">
-        <ol>
-          <li>Gehe zu <a href="https://jsonbin.io/signup" target="_blank">jsonbin.io/signup</a> — kostenlos registrieren</li>
-          <li>Nach dem Login → <strong>API Keys</strong> → den <strong>X-Master-Key</strong> kopieren</li>
-          <li>Hier einfügen:</li>
-        </ol>
-      </div>
-      <div class="fg">
-        <label>JSONBin.io Master Key</label>
-        <input type="text" id="sKey" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxxxxx">
-        <div class="ht">Wird lokal in deinem Browser gespeichert.</div>
-      </div>
-      <div class="fg" id="biG" style="display:none">
-        <label>Bin ID (optional)</label>
-        <input type="text" id="sBin" placeholder="Wird automatisch erstellt">
-        <div class="ht">Nur ausfüllen um einen bestehenden Bin wiederzuverwenden.</div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;margin-bottom:12px" onclick="document.getElementById('biG').style.display='block'">Erweiterte Optionen ▾</div>
-      <div class="ib" style="margin-bottom:0">
-        <h4>⚠️ Wichtig: Netlify Environment Variables</h4>
-        <p>Nach dem Erstellen der Bin-ID musst du <strong>zwei Env-Variablen</strong> in Netlify setzen (Site settings → Environment variables):<br>
-        <code style="color:var(--accent)">JSONBIN_API_KEY</code> = dein Master Key<br>
-        <code style="color:var(--accent)">JSONBIN_BIN_ID</code> = die Bin-ID (wird nach Setup angezeigt)</p>
-      </div>
-    </div>
-    <div class="sf">
-      <button class="btn" onclick="closeS()">Abbrechen</button>
-      <button class="btn btn-a" onclick="runS()">🚀 Verbinden</button>
-    </div>
-  </div>
-</div>
+</div><!-- /appWrapper -->
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ STATE ============
 const API='https://api.jsonbin.io/v3/b';
-let cfg=ld('bscfg')||{};
+let cfg=null; // {key, binId}
 let blocked=new Set();
 let cY,cM;const now=new Date();cY=now.getFullYear();cM=now.getMonth();
 let dragging=false,dragMode=null,dragDates=new Set();
 const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
-document.getElementById('wk').innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
-
-if(cfg.key&&cfg.binId){updateUrls();loadData()}
-else{openS();renderCal();setSt('err','Nicht verbunden')}
-
-function openS(){document.getElementById('sO').classList.add('open');if(cfg.key)document.getElementById('sKey').value=cfg.key;if(cfg.binId){document.getElementById('sBin').value=cfg.binId;document.getElementById('biG').style.display='block'}}
-function closeS(){document.getElementById('sO').classList.remove('open')}
-
-async function runS(){
-  const key=document.getElementById('sKey').value.trim();
-  let binId=document.getElementById('sBin').value.trim();
-  if(!key){toast('❌ API Key fehlt');return}
-  if(!binId){
-    toast('⏳ Erstelle Datenbank…');
-    try{
-      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Private':'false','X-Bin-Name':'booksync-blocked'},body:JSON.stringify({blocked:[]})});
-      if(!r.ok)throw new Error(await r.text());
-      const d=await r.json();binId=d.metadata.id;
-    }catch(e){toast('❌ '+e.message);return}
-  }
-  cfg={key,binId};sv('bscfg',cfg);updateUrls();closeS();toast('✅ Verbunden! Bin-ID: '+binId);loadData();
+// ============ LOGIN ============
+// Check for saved session
+const saved=sessionStorage.getItem('bs_session');
+if(saved){
+  try{
+    cfg=JSON.parse(saved);
+    showApp();
+  }catch(e){}
 }
 
+// Pre-fill from localStorage (convenience — remembers last key)
+const lastKey=localStorage.getItem('bs_lastkey');
+const lastBin=localStorage.getItem('bs_lastbin');
+if(lastKey)document.getElementById('loginKey').value=lastKey;
+if(lastBin)document.getElementById('loginBin').value=lastBin;
+
+async function doLogin(){
+  const key=document.getElementById('loginKey').value.trim();
+  let binId=document.getElementById('loginBin').value.trim();
+  const errEl=document.getElementById('loginError');
+  errEl.textContent='';
+
+  if(!key){errEl.textContent='Bitte API Key eingeben';shakeInput('loginKey');return}
+
+  // Validate key by trying to use it
+  if(!binId){
+    // Create new bin
+    errEl.textContent='⏳ Erstelle Datenbank…';
+    try{
+      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Private':'false','X-Bin-Name':'booksync-'+Date.now()},body:JSON.stringify({blocked:[]})});
+      if(!r.ok){
+        const t=await r.text();
+        if(t.includes('Invalid')||t.includes('Master Key'))throw new Error('Ungültiger API Key');
+        throw new Error(t);
+      }
+      const d=await r.json();binId=d.metadata.id;
+      errEl.textContent='';
+    }catch(e){errEl.textContent='❌ '+e.message;shakeInput('loginKey');return}
+  } else {
+    // Validate existing bin
+    errEl.textContent='⏳ Verbinde…';
+    try{
+      const r=await fetch(`${API}/${binId}/latest?meta=false`,{headers:{'X-Master-Key':key}});
+      if(!r.ok){
+        if(r.status===401||r.status===403)throw new Error('Ungültiger API Key');
+        if(r.status===404)throw new Error('Bin-ID nicht gefunden');
+        throw new Error('Fehler: '+r.status);
+      }
+      errEl.textContent='';
+    }catch(e){errEl.textContent='❌ '+e.message;shakeInput('loginKey');return}
+  }
+
+  // Success — save and show app
+  cfg={key,binId};
+  sessionStorage.setItem('bs_session',JSON.stringify(cfg));
+  localStorage.setItem('bs_lastkey',key);
+  localStorage.setItem('bs_lastbin',binId);
+  showApp();
+}
+
+function doLogout(){
+  sessionStorage.removeItem('bs_session');
+  cfg=null;blocked=new Set();
+  document.getElementById('appWrapper').style.display='none';
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginKey').focus();
+  toast('🔒 Abgemeldet');
+}
+
+function showApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appWrapper').style.display='';
+  document.getElementById('wk').innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
+  document.getElementById('dispBin').textContent=cfg.binId;
+  updateUrls();
+  loadData();
+}
+
+function shakeInput(id){const el=document.getElementById(id);el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),400)}
+
+// ============ DATA ============
 function updateUrls(){
   const base=window.location.origin;
   document.getElementById('icsUrl').textContent=base+'/feed.ics';
@@ -270,7 +368,7 @@ function updateUrls(){
 }
 
 async function loadData(){
-  if(!cfg.key||!cfg.binId)return;setSt('ld','Laden…');
+  if(!cfg)return;setSt('ld','Laden…');
   try{
     const r=await fetch(`${API}/${cfg.binId}/latest?meta=false`,{headers:{'X-Master-Key':cfg.key}});
     if(!r.ok)throw new Error(r.status);
@@ -280,13 +378,14 @@ async function loadData(){
 }
 
 async function saveData(){
-  if(!cfg.key||!cfg.binId)return;setSt('ld','Speichern…');
+  if(!cfg)return;setSt('ld','Speichern…');
   try{
     const r=await fetch(`${API}/${cfg.binId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':cfg.key},body:JSON.stringify({blocked:[...blocked].sort()})});
     if(!r.ok)throw new Error(r.status);setSt('ok','Gespeichert · '+ts());
   }catch(e){setSt('err','Fehler');toast('❌ Speichern fehlgeschlagen')}
 }
 
+// ============ CALENDAR ============
 function nav(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}renderCal()}
 function goT(){cY=now.getFullYear();cM=now.getMonth();renderCal()}
 
@@ -311,6 +410,7 @@ function renderCal(){
   document.getElementById('sF').textContent=fC+' frei';
 }
 
+// ============ DRAG ============
 function mD(e,ds,isB){e.preventDefault();dragging=true;dragMode=isB?'free':'block';dragDates=new Set([ds]);uDV()}
 function mE(ds){if(!dragging)return;dragDates.add(ds);uDV()}
 function mU(){
@@ -323,25 +423,25 @@ function mU(){
 function uDV(){document.querySelectorAll('.dy').forEach(el=>{el.classList.remove('sb','sf');if(dragDates.has(el.dataset.d))el.classList.add(dragMode==='block'?'sb':'sf')})}
 document.addEventListener('mouseup',()=>{if(dragging)mU()});
 
+// ============ QUICK ACTIONS ============
 function blockWE(){const dim=new Date(cY,cM+1,0).getDate();let c=0;for(let d=1;d<=dim;d++){const dt=new Date(cY,cM,d);if(dt.getDay()===0||dt.getDay()===6){blocked.add(fmt(dt));c++}}renderCal();saveData();toast(`🔒 ${c} Wochenendtage blockiert`)}
 function clearM(){const dim=new Date(cY,cM+1,0).getDate();let c=0;for(let d=1;d<=dim;d++){const ds=fmt(new Date(cY,cM,d));if(blocked.has(ds)){blocked.delete(ds);c++}}renderCal();saveData();toast(`✅ ${c} Tage freigegeben`)}
 function blockM(){const dim=new Date(cY,cM+1,0).getDate();for(let d=1;d<=dim;d++)blocked.add(fmt(new Date(cY,cM,d)));renderCal();saveData();toast('🔒 Ganzer Monat blockiert')}
 
+// ============ COPY ============
 function copyU(type){
   const base=window.location.origin;
   const url=type==='ics'?base+'/feed.ics':base+'/feed.json';
   navigator.clipboard.writeText(url).then(()=>toast('📋 URL kopiert!')).catch(()=>{
-    // Fallback
     const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('📋 URL kopiert!');
   });
 }
 
+// ============ HELPERS ============
 function fmt(d){if(typeof d==='string')return d;return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function ts(){return new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}
 function setSt(t,txt){document.querySelector('#sp .sd').className='sd '+t;document.getElementById('st').textContent=txt}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('vis');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('vis'),2800)}
-function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function ld(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
 </script>
 </body>
 </html>
