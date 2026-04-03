@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookSync — Belegungszentrale</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0D0C;--surface:#151716;--raised:#1C1F1C;--elevated:#232623;
+  --text:#E4E2DC;--muted:#6B6D64;--dim:#3A3C38;
+  --accent:#A3E635;--accent2:#D9F99D;--accent-bg:rgba(163,230,53,.08);--accent-bg2:rgba(163,230,53,.15);
+  --red:#EF4444;--red-bg:rgba(239,68,68,.12);--red-mid:#DC2626;
+  --green:#4ADE80;--green-bg:rgba(74,222,128,.1);
+  --blue:#60A5FA;--blue-bg:rgba(96,165,250,.1);
+  --orange:#FB923C;--orange-bg:rgba(251,146,60,.1);
+  --border:#262926;--border2:#333633;
+  --radius:14px;--radius-sm:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:15px}
+.logo h1{font-family:'Fraunces',serif;font-size:17px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo small{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.topbar-r{display:flex;gap:8px;align-items:center}
+.pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;background:var(--raised);border:1px solid var(--border)}
+.sd{width:7px;height:7px;border-radius:50%;animation:p 2s ease infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.sd.ok{background:var(--green)}.sd.err{background:var(--red)}.sd.ld{background:var(--orange)}
+.btn{padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--raised);font-family:'Outfit';font-size:11px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--elevated);border-color:var(--border2)}
+.btn-a{background:var(--accent);color:var(--bg);border-color:var(--accent)}.btn-a:hover{background:#8BC62C}
+.btn-sm{padding:5px 10px;font-size:10px}
+
+.layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 57px)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{border-left:none;border-top:1px solid var(--border)}}
+
+.main{padding:24px}
+.cc{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.cn{display:flex;align-items:center;gap:8px}
+.nb{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:15px;display:grid;place-items:center;transition:all .15s}
+.nb:hover{border-color:var(--accent);color:var(--accent)}
+.ml{font-family:'Fraunces',serif;font-size:22px;font-weight:700;min-width:200px;text-align:center}
+.cs{display:flex;gap:8px}
+.st{padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px}
+
+.cal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.cwk{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)}
+.cwd{padding:10px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+.cds{display:grid;grid-template-columns:repeat(7,1fr);user-select:none}
+.dy{min-height:80px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 7px;cursor:pointer;transition:background .12s;position:relative}
+.dy:nth-child(7n){border-right:none}
+.dy.out{opacity:.12;pointer-events:none}
+.dy:hover{background:var(--raised)}
+.dy.today .dn{background:var(--accent);color:var(--bg);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-weight:700}
+.dn{font-size:12px;font-weight:500}
+.dy.blocked{background:var(--red-bg)}
+.dy.blocked::after{content:'';position:absolute;bottom:6px;left:7px;right:7px;height:6px;border-radius:3px;background:var(--red);opacity:.7}
+.dy.past{opacity:.35}.dy.past.blocked::after{opacity:.3}
+.dy.sb{background:rgba(239,68,68,.2);outline:2px solid var(--red);outline-offset:-2px;z-index:1}
+.dy.sf{background:rgba(74,222,128,.2);outline:2px solid var(--green);outline-offset:-2px;z-index:1}
+.ch{padding:10px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.lg{display:flex;gap:14px;margin-top:12px;flex-wrap:wrap}
+.lg-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.lg-d{width:8px;height:8px;border-radius:3px}
+
+.side{background:var(--surface);border-left:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.sbt{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.fc{background:var(--raised);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.fc h4{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.fc .tg{font-size:9px;padding:2px 7px;border-radius:99px;font-weight:700}
+.fu-box{display:flex;gap:6px;align-items:center;margin-top:8px}
+.fu{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:10px;color:var(--accent);font-family:'Courier New',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:text}
+.fd{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.qg{display:flex;flex-direction:column;gap:6px}
+.qb{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--raised);cursor:pointer;transition:all .15s;font-family:'Outfit';font-size:12px;font-weight:500;color:var(--text);text-align:left}
+.qb:hover{background:var(--elevated);border-color:var(--border2)}
+.qb .ic{font-size:18px;width:28px;text-align:center}
+.qb small{color:var(--muted);font-size:10px;display:block;margin-top:1px}
+.ib{background:var(--accent-bg);border:1px solid rgba(163,230,53,.15);border-radius:var(--radius-sm);padding:14px}
+.ib h4{font-size:12px;color:var(--accent);margin-bottom:4px}
+.ib p{font-size:11px;color:var(--muted);line-height:1.6}
+
+.so{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;display:none;place-items:center}
+.so.open{display:grid}
+.sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:480px;max-width:92vw;animation:mU .25s ease-out;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+@keyframes mU{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sh{padding:22px 24px;border-bottom:1px solid var(--border)}
+.sh h2{font-family:'Fraunces',serif;font-size:22px;margin-bottom:4px}
+.sh p{font-size:12px;color:var(--muted)}
+.sb{padding:24px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.fg input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Outfit';font-size:13px;background:var(--bg);color:var(--text);outline:none}
+.fg input:focus{border-color:var(--accent)}
+.fg .ht{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.5}
+.sf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.ss{padding:0 0 16px;font-size:12px;color:var(--muted);line-height:2}
+.ss ol{padding-left:20px}
+.ss a{color:var(--accent);font-weight:600;text-decoration:none}
+
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--accent);color:var(--bg);padding:9px 20px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;opacity:0;transition:all .3s;z-index:500;white-space:nowrap}
+.toast.vis{transform:translateX(-50%) translateY(0);opacity:1}
+
+@media(max-width:600px){.dy{min-height:52px;padding:3px 4px}.dn{font-size:10px}.dy.blocked::after{height:4px;bottom:3px;left:3px;right:3px}.ml{font-size:17px;min-width:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-mark">B</div><div><h1>BookSync</h1><small>Belegungszentrale</small></div></div>
+  <div class="topbar-r">
+    <div class="pill" id="sp"><span class="sd ld"></span><span id="st">Verbinde…</span></div>
+    <button class="btn" onclick="loadData()">🔄</button>
+    <button class="btn" onclick="openS()">⚙️</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="main">
+    <div class="cc">
+      <div class="cn">
+        <button class="nb" onclick="nav(-1)">‹</button>
+        <div class="ml" id="ml"></div>
+        <button class="nb" onclick="nav(1)">›</button>
+        <button class="btn btn-sm" style="margin-left:6px" onclick="goT()">Heute</button>
+      </div>
+      <div class="cs">
+        <div class="st" style="background:var(--red-bg);color:var(--red)" id="sB">0 blockiert</div>
+        <div class="st" style="background:var(--green-bg);color:var(--green)" id="sF">0 frei</div>
+      </div>
+    </div>
+    <div class="cal">
+      <div class="cwk" id="wk"></div>
+      <div class="cds" id="days"></div>
+      <div class="ch">🖱️ Klicken = Tag umschalten · Ziehen = mehrere Tage auf einmal</div>
+    </div>
+    <div class="lg">
+      <div class="lg-i"><div class="lg-d" style="background:var(--green)"></div>Frei</div>
+      <div class="lg-i"><div class="lg-d" style="background:var(--red)"></div>Blockiert</div>
+      <div class="lg-i"><div class="lg-d" style="background:var(--dim)"></div>Vergangen</div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div>
+      <div class="sbt">Deine Live-Feeds (Output)</div>
+
+      <div class="fc">
+        <h4>📅 iCal Feed <span class="tg" style="background:var(--blue-bg);color:var(--blue)">LIVE URL</span></h4>
+        <div class="fd">Für <strong>Airbnb, Booking.com, Gruppenunterkünfte.de</strong> — diese URL als Kalender importieren.</div>
+        <div class="fu-box">
+          <div class="fu" id="icsUrl">—</div>
+          <button class="btn btn-sm" onclick="copyU('ics')">📋</button>
+        </div>
+      </div>
+
+      <div class="fc">
+        <h4>📊 JSON Feed <span class="tg" style="background:var(--green-bg);color:var(--green)">LIVE URL</span></h4>
+        <div class="fd">Für dein <strong>Website-Kalender-Plugin</strong>. Liefert die blockierten Tage als JSON.</div>
+        <div class="fu-box">
+          <div class="fu" id="jsonUrl">—</div>
+          <button class="btn btn-sm" onclick="copyU('json')">📋</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sbt">Schnellaktionen</div>
+      <div class="qg">
+        <button class="qb" onclick="blockWE()"><span class="ic">📅</span><div>Wochenenden blockieren<small>Sa + So dieses Monats</small></div></button>
+        <button class="qb" onclick="clearM()"><span class="ic">🧹</span><div>Monat freigeben<small>Alle Blockierungen entfernen</small></div></button>
+        <button class="qb" onclick="blockM()"><span class="ic">🔒</span><div>Ganzen Monat blockieren<small>Alle Tage sperren</small></div></button>
+      </div>
+    </div>
+
+    <div>
+      <div class="sbt">Integration</div>
+      <div class="ib">
+        <h4>💡 So nutzt du die Feeds</h4>
+        <p>
+          <strong>Airbnb:</strong> Inserat → Verfügbarkeit → "Kalender importieren" → iCal-URL einfügen<br><br>
+          <strong>Booking.com:</strong> Extranet → Sync-Kalender → URL einfügen<br><br>
+          <strong>Website-Plugin:</strong> JSON-Feed-URL als Datenquelle eintragen<br><br>
+          Plattformen aktualisieren alle paar Stunden automatisch.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="so" id="sO">
+  <div class="sm">
+    <div class="sh"><h2>⚙️ Einrichtung</h2><p>Verbinde JSONBin.io als kostenlosen Cloud-Speicher.</p></div>
+    <div class="sb">
+      <div class="ss">
+        <ol>
+          <li>Gehe zu <a href="https://jsonbin.io/signup" target="_blank">jsonbin.io/signup</a> — kostenlos registrieren</li>
+          <li>Nach dem Login → <strong>API Keys</strong> → den <strong>X-Master-Key</strong> kopieren</li>
+          <li>Hier einfügen:</li>
+        </ol>
+      </div>
+      <div class="fg">
+        <label>JSONBin.io Master Key</label>
+        <input type="text" id="sKey" placeholder="$2a$10$xxxxxxxxxxxxxxxxxxxxxxx">
+        <div class="ht">Wird lokal in deinem Browser gespeichert.</div>
+      </div>
+      <div class="fg" id="biG" style="display:none">
+        <label>Bin ID (optional)</label>
+        <input type="text" id="sBin" placeholder="Wird automatisch erstellt">
+        <div class="ht">Nur ausfüllen um einen bestehenden Bin wiederzuverwenden.</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;margin-bottom:12px" onclick="document.getElementById('biG').style.display='block'">Erweiterte Optionen ▾</div>
+      <div class="ib" style="margin-bottom:0">
+        <h4>⚠️ Wichtig: Netlify Environment Variables</h4>
+        <p>Nach dem Erstellen der Bin-ID musst du <strong>zwei Env-Variablen</strong> in Netlify setzen (Site settings → Environment variables):<br>
+        <code style="color:var(--accent)">JSONBIN_API_KEY</code> = dein Master Key<br>
+        <code style="color:var(--accent)">JSONBIN_BIN_ID</code> = die Bin-ID (wird nach Setup angezeigt)</p>
+      </div>
+    </div>
+    <div class="sf">
+      <button class="btn" onclick="closeS()">Abbrechen</button>
+      <button class="btn btn-a" onclick="runS()">🚀 Verbinden</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://api.jsonbin.io/v3/b';
+let cfg=ld('bscfg')||{};
+let blocked=new Set();
+let cY,cM;const now=new Date();cY=now.getFullYear();cM=now.getMonth();
+let dragging=false,dragMode=null,dragDates=new Set();
+const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
+document.getElementById('wk').innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
+
+if(cfg.key&&cfg.binId){updateUrls();loadData()}
+else{openS();renderCal();setSt('err','Nicht verbunden')}
+
+function openS(){document.getElementById('sO').classList.add('open');if(cfg.key)document.getElementById('sKey').value=cfg.key;if(cfg.binId){document.getElementById('sBin').value=cfg.binId;document.getElementById('biG').style.display='block'}}
+function closeS(){document.getElementById('sO').classList.remove('open')}
+
+async function runS(){
+  const key=document.getElementById('sKey').value.trim();
+  let binId=document.getElementById('sBin').value.trim();
+  if(!key){toast('❌ API Key fehlt');return}
+  if(!binId){
+    toast('⏳ Erstelle Datenbank…');
+    try{
+      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Private':'false','X-Bin-Name':'booksync-blocked'},body:JSON.stringify({blocked:[]})});
+      if(!r.ok)throw new Error(await r.text());
+      const d=await r.json();binId=d.metadata.id;
+    }catch(e){toast('❌ '+e.message);return}
+  }
+  cfg={key,binId};sv('bscfg',cfg);updateUrls();closeS();toast('✅ Verbunden! Bin-ID: '+binId);loadData();
+}
+
+function updateUrls(){
+  const base=window.location.origin;
+  document.getElementById('icsUrl').textContent=base+'/feed.ics';
+  document.getElementById('jsonUrl').textContent=base+'/feed.json';
+}
+
+async function loadData(){
+  if(!cfg.key||!cfg.binId)return;setSt('ld','Laden…');
+  try{
+    const r=await fetch(`${API}/${cfg.binId}/latest?meta=false`,{headers:{'X-Master-Key':cfg.key}});
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();blocked=new Set(d.blocked||[]);
+    renderCal();setSt('ok','Sync · '+ts());
+  }catch(e){setSt('err','Fehler');renderCal()}
+}
+
+async function saveData(){
+  if(!cfg.key||!cfg.binId)return;setSt('ld','Speichern…');
+  try{
+    const r=await fetch(`${API}/${cfg.binId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':cfg.key},body:JSON.stringify({blocked:[...blocked].sort()})});
+    if(!r.ok)throw new Error(r.status);setSt('ok','Gespeichert · '+ts());
+  }catch(e){setSt('err','Fehler');toast('❌ Speichern fehlgeschlagen')}
+}
+
+function nav(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}renderCal()}
+function goT(){cY=now.getFullYear();cM=now.getMonth();renderCal()}
+
+function renderCal(){
+  document.getElementById('ml').textContent=MN[cM]+' '+cY;
+  const f=new Date(cY,cM,1);let so=f.getDay()-1;if(so<0)so=6;
+  const dim=new Date(cY,cM+1,0).getDate(),dip=new Date(cY,cM,0).getDate();
+  const tS=fmt(now),total=Math.ceil((so+dim)/7)*7;
+  let bC=0,fC=0,h='';
+  for(let i=0;i<total;i++){
+    let day,mo=cM,yr=cY,out=false;
+    if(i<so){day=dip-so+i+1;mo--;if(mo<0){mo=11;yr--}out=true}
+    else if(i>=so+dim){day=i-so-dim+1;mo++;if(mo>11){mo=0;yr++}out=true}
+    else day=i-so+1;
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isT=ds===tS,isB=blocked.has(ds),isP=ds<tS;
+    if(!out){if(isB)bC++;else fC++}
+    h+=`<div class="dy${out?' out':''}${isT?' today':''}${isB?' blocked':''}${isP&&!out?' past':''}" data-d="${ds}" onmousedown="mD(event,'${ds}',${isB})" onmouseenter="mE('${ds}')" onmouseup="mU()" ontouchstart="mD(event,'${ds}',${isB})" ontouchend="mU()"><div class="dn">${day}</div></div>`;
+  }
+  document.getElementById('days').innerHTML=h;
+  document.getElementById('sB').textContent=bC+' blockiert';
+  document.getElementById('sF').textContent=fC+' frei';
+}
+
+function mD(e,ds,isB){e.preventDefault();dragging=true;dragMode=isB?'free':'block';dragDates=new Set([ds]);uDV()}
+function mE(ds){if(!dragging)return;dragDates.add(ds);uDV()}
+function mU(){
+  if(!dragging)return;dragging=false;
+  const n=dragDates.size;
+  dragDates.forEach(ds=>{if(dragMode==='block')blocked.add(ds);else blocked.delete(ds)});
+  dragDates=new Set();renderCal();saveData();
+  toast(dragMode==='block'?`🔒 ${n} Tag${n>1?'e':''} blockiert`:`✅ ${n} Tag${n>1?'e':''} freigegeben`);
+}
+function uDV(){document.querySelectorAll('.dy').forEach(el=>{el.classList.remove('sb','sf');if(dragDates.has(el.dataset.d))el.classList.add(dragMode==='block'?'sb':'sf')})}
+document.addEventListener('mouseup',()=>{if(dragging)mU()});
+
+function blockWE(){const dim=new Date(cY,cM+1,0).getDate();let c=0;for(let d=1;d<=dim;d++){const dt=new Date(cY,cM,d);if(dt.getDay()===0||dt.getDay()===6){blocked.add(fmt(dt));c++}}renderCal();saveData();toast(`🔒 ${c} Wochenendtage blockiert`)}
+function clearM(){const dim=new Date(cY,cM+1,0).getDate();let c=0;for(let d=1;d<=dim;d++){const ds=fmt(new Date(cY,cM,d));if(blocked.has(ds)){blocked.delete(ds);c++}}renderCal();saveData();toast(`✅ ${c} Tage freigegeben`)}
+function blockM(){const dim=new Date(cY,cM+1,0).getDate();for(let d=1;d<=dim;d++)blocked.add(fmt(new Date(cY,cM,d)));renderCal();saveData();toast('🔒 Ganzer Monat blockiert')}
+
+function copyU(type){
+  const base=window.location.origin;
+  const url=type==='ics'?base+'/feed.ics':base+'/feed.json';
+  navigator.clipboard.writeText(url).then(()=>toast('📋 URL kopiert!')).catch(()=>{
+    // Fallback
+    const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('📋 URL kopiert!');
+  });
+}
+
+function fmt(d){if(typeof d==='string')return d;return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function ts(){return new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}
+function setSt(t,txt){document.querySelector('#sp .sd').className='sd '+t;document.getElementById('st').textContent=txt}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('vis');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('vis'),2800)}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function ld(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/feed.ics"
+  to = "/.netlify/functions/ical"
+  status = 200
+
+[[redirects]]
+  from = "/feed.json"
+  to = "/.netlify/functions/json"
+  status = 200
