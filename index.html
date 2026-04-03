@@ -299,10 +299,15 @@ let dragging=false,dragMode=null,dragDates=new Set();
 const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
 // ============ LOGIN ============
-const savedSession=sessionStorage.getItem('bs_sess');
-if(savedSession){try{const s=JSON.parse(savedSession);apiKey=s.key;props=s.props||[];showApp()}catch(e){}}
-const lastK=localStorage.getItem('bs_lk');
-if(lastK)document.getElementById('loginKey').value=lastK;
+function initApp(){
+  const savedSession=sessionStorage.getItem('bs_sess');
+  if(savedSession){try{const s=JSON.parse(savedSession);apiKey=s.key;props=s.props||[];showApp()}catch(e){}}
+  const lastK=localStorage.getItem('bs_lk');
+  if(lastK)document.getElementById('loginKey').value=lastK;
+}
+
+// Run after DOM is ready
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initApp)}else{initApp()}
 
 async function doLogin(){
   const key=document.getElementById('loginKey').value.trim();
@@ -531,4 +536,3 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 </script>
 </body>
 </html>
-
