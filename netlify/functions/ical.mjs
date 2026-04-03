@@ -1,14 +1,14 @@
 // Netlify Serverless Function: iCal Feed
-// Returns blocked dates as a proper .ics calendar file
-// URL: https://your-site.netlify.app/feed.ics
+// URL: https://your-site.netlify.app/feed.ics?bin=BIN_ID
 
 export default async (request, context) => {
-  const BIN_ID = Netlify.env.get("JSONBIN_BIN_ID");
+  const url = new URL(request.url);
+  const BIN_ID = url.searchParams.get("bin");
   const API_KEY = Netlify.env.get("JSONBIN_API_KEY");
 
   if (!BIN_ID || !API_KEY) {
-    return new Response("iCal Feed nicht konfiguriert. Bitte JSONBIN_BIN_ID und JSONBIN_API_KEY in Netlify Environment Variables setzen.", {
-      status: 500,
+    return new Response("iCal Feed: ?bin= Parameter oder JSONBIN_API_KEY fehlt.", {
+      status: 400,
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
   }
@@ -22,7 +22,6 @@ export default async (request, context) => {
     const data = await res.json();
     const blocked = (data.blocked || []).sort();
 
-    // Group consecutive dates into events
     const events = [];
     let i = 0;
     while (i < blocked.length) {
@@ -32,7 +31,6 @@ export default async (request, context) => {
         i++;
         end = blocked[i];
       }
-      // iCal DTEND is exclusive
       const endDate = new Date(end + "T00:00:00Z");
       endDate.setUTCDate(endDate.getUTCDate() + 1);
       const endStr = endDate.toISOString().split("T")[0].replace(/-/g, "");
@@ -45,7 +43,7 @@ export default async (request, context) => {
         `STATUS:CONFIRMED\r\n` +
         `TRANSP:OPAQUE\r\n` +
         `UID:${start}-${end}@booksync\r\n` +
-        `DTSTAMP:${now()}\r\n` +
+        `DTSTAMP:${stamp()}\r\n` +
         `END:VEVENT`
       );
       i++;
@@ -57,7 +55,7 @@ export default async (request, context) => {
       `PRODID:-//BookSync//Belegungszentrale//DE\r\n` +
       `CALSCALE:GREGORIAN\r\n` +
       `METHOD:PUBLISH\r\n` +
-      `X-WR-CALNAME:Gruppenunterkunft Belegung\r\n` +
+      `X-WR-CALNAME:Unterkunft Belegung\r\n` +
       `X-WR-TIMEZONE:Europe/Berlin\r\n` +
       events.join("\r\n") + (events.length ? "\r\n" : "") +
       `END:VCALENDAR`;
@@ -72,7 +70,7 @@ export default async (request, context) => {
       }
     });
   } catch (e) {
-    return new Response("Fehler beim Laden der Daten: " + e.message, {
+    return new Response("Fehler: " + e.message, {
       status: 500,
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
@@ -85,6 +83,6 @@ function isNextDay(a, b) {
   return d.toISOString().split("T")[0] === b;
 }
 
-function now() {
+function stamp() {
   return new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 }
