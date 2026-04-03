@@ -10,3 +10,8 @@
   from = "/feed.json"
   to = "/.netlify/functions/json"
   status = 200
+
+[[redirects]]
+  from = "/api/sync"
+  to = "/.netlify/functions/sync"
+  status = 200
