@@ -351,7 +351,8 @@ function doLogout(){
 function showApp(){
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('app').style.display='';
-  document.getElementById('wk').innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
+  const wk=document.getElementById('wk');
+  if(wk)wk.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
   renderProps();
   if(props.length>0)selectProp(props[0].id);
   else showNoProp();
@@ -422,7 +423,11 @@ function selectProp(id){
   document.getElementById('feedSection').style.display='';
   document.getElementById('actionsSection').style.display='';
   document.getElementById('feedPropName').textContent=p.name;
+  // Ensure weekday headers exist
+  const wk=document.getElementById('wk');
+  if(wk&&!wk.hasChildNodes())wk.innerHTML=['Mo','Di','Mi','Do','Fr','Sa','So'].map(w=>`<div class="cwd">${w}</div>`).join('');
   updateUrls();
+  renderCal();
   loadBin();
 }
 
@@ -464,7 +469,12 @@ function nav(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}renderCal()}
 function goT(){cY=now.getFullYear();cM=now.getMonth();renderCal()}
 
 function renderCal(){
-  document.getElementById('ml').textContent=MN[cM]+' '+cY;
+  const mlEl=document.getElementById('ml');
+  const daysEl=document.getElementById('days');
+  const sBEl=document.getElementById('sB');
+  const sFEl=document.getElementById('sF');
+  if(!mlEl||!daysEl)return;
+  mlEl.textContent=MN[cM]+' '+cY;
   const f=new Date(cY,cM,1);let so=f.getDay()-1;if(so<0)so=6;
   const dim=new Date(cY,cM+1,0).getDate(),dip=new Date(cY,cM,0).getDate();
   const tS=fmt(now),total=Math.ceil((so+dim)/7)*7;
@@ -479,9 +489,9 @@ function renderCal(){
     if(!out){if(isB)bC++;else fC++}
     h+=`<div class="dy${out?' out':''}${isT?' today':''}${isB?' blocked':''}${isP&&!out?' past':''}" data-d="${ds}" onmousedown="mD(event,'${ds}',${isB})" onmouseenter="mE('${ds}')" onmouseup="mU()" ontouchstart="mD(event,'${ds}',${isB})" ontouchend="mU()"><div class="dn">${day}</div></div>`;
   }
-  document.getElementById('days').innerHTML=h;
-  document.getElementById('sB').textContent=bC+' blockiert';
-  document.getElementById('sF').textContent=fC+' frei';
+  daysEl.innerHTML=h;
+  if(sBEl)sBEl.textContent=bC+' blockiert';
+  if(sFEl)sFEl.textContent=fC+' frei';
 }
 
 // ============ DRAG ============
@@ -521,3 +531,4 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 </script>
 </body>
 </html>
+
